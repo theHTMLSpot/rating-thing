@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   BrowserRouter as Router,
   Route,
@@ -87,6 +87,22 @@ function Rating(props) {
 }
 function Thanks()
 {
+
+  const [averageRating, setResponse] = useState();
+
+  useEffect( () => {
+    const asyncFn = async ()=>{
+      const responseHttp = await fetch("http://localhost:8000/average-rating");
+      const response =  await responseHttp.text();
+      console.log(response);
+      setResponse(response);
+    }
+    asyncFn();
+   
+    
+  }, [])
+  
+
   let response = "";
 
   const { state } = useLocation();
@@ -115,7 +131,7 @@ function Thanks()
             
             <p className='paragraph'>{response}</p>
   
-          
+            <p className='paragraph'>{averageRating}</p>
           </header>
         </div>
       </div>
