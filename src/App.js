@@ -1,31 +1,40 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Routes,
+  useLocation
+} from "react-router-dom";
 
 
-function App() {
+function App()
+{
+  return(
+  <Router>
+    <Routes>
+        <Route exact path='/' element={<Rating />}/>
+        <Route path='/thanks' element={<Thanks />}/>
+    </Routes>
+  </Router>
+  );
+}
 
-  const [state, setState] = useState(1);
+function Rating(props) {
+
+  const [rating, setRating] = useState(1);
 
 
 
   function GetRadio(radio)
   {
-    setState(radio.target.value);
-
-
-
- }
-
-  function GetRating()
-  {
-    
-    let rating = state;
-    console.log(rating);
-    alert(`you ave us a rating of ${rating}` );
-
-
+    setRating(radio.target.value);
   }
+
+
+ 
   return (
     <div className="App">
 
@@ -65,15 +74,53 @@ function App() {
             </li>
 
           </ul>
-
-          <button className='submit-button' type='submit' onClick={GetRating}>submit</button>
+          <Link to='/thanks' state={{rating}}>
+            <button className='submit-button' type='submit' >
+              submit
+            </button>
+          </Link>
         </header>
       </div>
     </div>
   );
   
 }
+function Thanks()
+{
+  let response = "";
 
+  const { state } = useLocation();
+
+  
+  let rating = state.rating;
+
+  if (rating<3)
+    {
+      response = `you gave us a ${rating} Awh thats too bad what can we do better`;
+    }
+  else if (rating >=3 && rating<5)
+    {
+      response = `you gave us a ${rating} Okay thats nice`;
+    }
+    else
+    {
+      response = `you gave us a ${rating} Thanks for the perfect rating`;
+    }
+  return(
+      <div className="App">
+  
+        <div className='background'>
+          <header className="experince-rating">
+            <h1 className='heading'>Thanks for telling us about your experince</h1>
+            
+            <p className='paragraph'>{response}</p>
+  
+          
+          </header>
+        </div>
+      </div>
+  );
+}
 
 
 export default App;
