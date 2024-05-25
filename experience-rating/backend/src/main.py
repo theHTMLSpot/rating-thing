@@ -1,41 +1,35 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 ratings: list[int] = []
 
 origins = [
     "http://localhost:3000"
-
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = origins,
-    allow_methods =["*"],
-    allow_headers =["*"]
-
+    allow_origins=origins,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
-@app.post('/rating')
-def PostRating(rating: int):
-    ratings.append(rating)
-    return {"message": "Success" }
+class Rating(BaseModel):
+    rating: int
 
+@app.post('/rating')
+def post_rating(rating: Rating):
+    if rating.rating < 0 or rating.rating > 5:  # Assuming ratings are between 0 and 5
+        raise HTTPException(status_code=400, detail="Rating must be between 0 and 5")
+    ratings.append(rating.rating)
+    return {"message": "Success"}
 
 @app.get('/average-rating')
-def AverageRating():
-
-    average = 0
-    length = len(ratings)
-    number = 0
-    for i in range(length):
-        number += ratings[i]
-    if length != 0:
-        average =number/length
+def average_rating():
+    if not ratings:
+        raise HTTPException(status_code=404, detail="No ratings available")
     
-    return average
-
-    
-
-    
+    average = sum(ratings) / len(ratings)
+    return {"average_rating": average}
